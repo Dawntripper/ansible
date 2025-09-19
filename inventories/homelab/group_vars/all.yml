@@ -21,11 +21,11 @@ nvidia_install: false
 users:
   - username: "tyler"
     sshpublic: 
-      - "{{ lookup('file', 'files/ssh_keys/tyler.keys') }}"
+      - "{{ lookup('file', '../../files/ssh_keys/tyler.keys') }}"
     comment: "Tyler"  
   - username: "automation"
     sshpublic: 
-      - "{{ lookup('file', 'files/ssh_keys/automation.keys') }}"
+      - "{{ lookup('file', '../../files/ssh_keys/automation.keys') }}"
     comment: "Automation"  
 
 # Sudo Group Assignment: Debian vs. RHEL Systems.

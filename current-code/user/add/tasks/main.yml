@@ -1,0 +1,93 @@
+--- 
+# Create Groups
+- name: "Create a group named 'dusktripper'"
+  become: true
+  ansible.builtin.group:
+    name: dusktripper
+    gid: 1991
+    state: present
+
+# Create the accounts, and set default shell.
+- name: "Create Accounts: Main"
+  become: true
+  register: user_status
+  user: 
+    append: true
+    groups: "{{ sudoGroup }}, dusktripper"
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    state: present
+  with_items: "{{ users }}"
+
+# Add SSH Keys to accounts.
+- name: "Add Public SSH Keys:"
+  ansible.builtin.authorized_key: 
+    exclusive: yes
+    key: '{{ item.sshpublic | join("\n") }}'
+    user: "{{ item.username }}"
+  become: true
+  with_items: "{{ users }}"
+# --- #
+
+# Create .bashrc File 
+# --- #
+- name: "Ensure .bashrc Exists"
+  become: true
+  ansible.builtin.file:
+    path: "/home/{{ item.username }}/.bashrc"
+    state: touch
+    mode: '0644'
+  with_items: "{{ users }}"
+# --- #ans
+
+# Update BASH Prompts: Ubuntu
+# --- #
+- name: "Remove User BASH Configuration - Debian/Ubuntu"
+  become: true
+  shell: |
+    sed -i.bak \
+    -e '/if \[ "\$color_prompt" = yes \]; then/,/fi/ d' \
+    -e '/^unset color_prompt force_color_prompt$/ d' \
+    /home/{{ item.username }}/.bashrc
+  args:
+    executable: /bin/bash
+  with_items: "{{ users }}"
+  when: "(ansible_os_family == 'Debian')"
+
+- name: "User Bash Prompts - Debian/Ubuntu:"
+  become: true
+  blockinfile:
+    path: "/home/{{ item.username }}/.bashrc"
+    marker: ""     
+    block: |
+      if [ "$color_prompt" = yes ]; then
+          PS1='${debian_chroot:+($debian_chroot)}\[\033[01;34m\]\u@\h\[\033[01;35m\]({{ bash_description }})\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+      else
+          PS1='${debian_chroot:+($debian_chroot)}\u@\h({{ bash_description }}):\w\$ '
+      fi
+      unset color_prompt force_color_prompt
+  with_items: "{{ users }}"
+  when: "(ansible_os_family == 'Debian')"
+
+# Update BASH Prompts: CentOS | RHEL | Amazon
+# --- #
+
+- name: "Remove User BASH Configuration - RHEL/CentOS/Amazon:"
+  become: true
+  replace:
+    path: "/home/{{ item }}/.bashrc"
+    regexp: '^PS1=.*$'
+    replace: ''
+    backup: yes
+  with_items: "{{ users }}"
+  when: "((ansible_distribution == 'CentOS') or (ansible_distribution == 'RedHat') or (ansible_distribution == 'Amazon'))"
+
+- name: "User Bash Prompts - RHEL/CentOS/Amazon:"
+  become: true
+  blockinfile:
+    path: "/home/{{ item }}/.bashrc"
+    marker: ""
+    block: |
+      PS1='\[\033[01;34m\]\u@\h\[\033[01;35m\]({{ bash_description }})\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+  with_items: "{{ users }}"
+  when: "((ansible_distribution == 'CentOS') or (ansible_distribution == 'RedHat') or (ansible_distribution == 'Amazon'))"

@@ -1,0 +1,27 @@
+---
+#===========================#
+# Non-User Variables
+#===========================#
+common_packages:
+  - nano
+  - gnupg
+  - inetutils-ping
+  - htop
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - software-properties-common
+  - python3-pip
+  - virtualenv
+  - python3-setuptools
+  - acl
+  - cron
+  - dnsutils
+  - telnet
+plex_media_server_packages:
+  - plexmediaserver
+wireguard_packages:
+  - wireguard
+docker_packages:
+  - docker-ce
+  - docker-compose

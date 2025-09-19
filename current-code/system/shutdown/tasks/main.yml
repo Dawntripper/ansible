@@ -1,0 +1,6 @@
+---
+- name: "Shutdown Host:"
+  become: true
+  ansible.builtin.command:
+    cmd: /sbin/shutdown -h now
+  ignore_errors: true

@@ -1,0 +1,15 @@
+---
+# Set Timezone to Central
+# --- #
+- name: Get current timezone
+  become: true
+  ansible.builtin.command: timedatectl show -p Timezone --value
+  register: current_timezone
+  changed_when: false
+
+- name: Set timezone to Central Time using timedatectl
+  become: true
+  ansible.builtin.command: timedatectl set-timezone America/Chicago
+  when: current_timezone.stdout != "America/Chicago"
+  changed_when: true
+# --- #

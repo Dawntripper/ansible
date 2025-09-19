@@ -1,0 +1,6 @@
+---
+- name: "System Baseline"
+  hosts: baseline
+  roles:
+  - system/baseline
+  - user/baseline

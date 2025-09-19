@@ -1,0 +1,9 @@
+---
+# Passwordless SUDO
+- name: Enable passwordless sudo for 'dusktripper' group
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    state: present
+    line: "%dusktripper ALL=(ALL) NOPASSWD: ALL"
+    validate: "visudo -cf %s"

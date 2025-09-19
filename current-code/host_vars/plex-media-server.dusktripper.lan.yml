@@ -1,0 +1,7 @@
+---
+ansible_ssh_user: tyler
+bash_description: Plex Media Server
+plex_media_server_install: true
+wireguard_install: false
+docker_install: false
+nvidia_install: true

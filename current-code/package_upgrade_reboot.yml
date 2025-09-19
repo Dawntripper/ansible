@@ -1,0 +1,6 @@
+---
+- name: "Maintenance | Package Upgrade & Reboot"
+  hosts: package_upgrade_reboot
+  roles:
+  - system/package
+  - system/reboot

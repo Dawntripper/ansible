@@ -1,0 +1,32 @@
+--- 
+#===========================#
+# User Variables
+#===========================#
+
+bash_description: ""
+
+# Additional Packages
+plex_media_server_install: false
+wireguard_install: false
+docker_install: false
+nvidia_install: false
+
+#===========================#
+# Non-User Variables
+#===========================#
+
+# Note: In general, these should not be changed.
+
+# User Information:
+users:
+  - username: "tyler"
+    sshpublic: 
+      - "{{ lookup('file', 'files/ssh_keys/tyler.keys') }}"
+    comment: "Tyler"  
+  - username: "automation"
+    sshpublic: 
+      - "{{ lookup('file', 'files/ssh_keys/automation.keys') }}"
+    comment: "Automation"  
+
+# Sudo Group Assignment: Debian vs. RHEL Systems.
+sudoGroup: "{{ 'sudo' if ansible_os_family == 'Debian' else 'wheel' }}"

@@ -1,0 +1,66 @@
+# Inventory File.
+
+# Host Options
+postgres.dusktripper.lan
+missouri-plex.dusktripper.lan
+k3s-rick.dusktripper.lan
+dusker.dusktripper.lan
+docker.dusktripper.lan
+github-runner.dusktripper.lan
+
+# System Baseline
+[baseline]
+github-runner.dusktripper.lan
+postgres.dusktripper.lan
+missouri-plex.dusktripper.lan
+# k3s-rick.dusktripper.lan
+dusker.dusktripper.lan
+docker.dusktripper.lan
+
+# User Management
+[user_management]
+github-runner.dusktripper.lan
+postgres.dusktripper.lan
+missouri-plex.dusktripper.lan
+k3s-rick.dusktripper.lan
+dusker.dusktripper.lan
+docker.dusktripper.lan
+
+# Package Upgrade (With Reboot)
+[package_upgrade_reboot]
+postgres.dusktripper.lan
+missouri-plex.dusktripper.lan
+docker.dusktripper.lan
+
+# Package Upgrade (No Reboot)
+[package_upgrade]
+postgres.dusktripper.lan
+missouri-plex.dusktripper.lan
+k3s-rick.dusktripper.lan
+dusker.dusktripper.lan
+docker.dusktripper.lan
+github-runner.dusktripper.lan
+
+# Shutdown
+[shutdown]
+postgres.dusktripper.lan
+
+# Wireguard
+[package_wireguard]
+
+# Plex
+[package_plex]
+
+
+# Variables
+# ----------------------------- #
+[all:vars]
+ansible_ssh_private_key_file=
+ansible_ssh_user=automation
+ansible_port=22
+
+# Static (DO NOT EDIT BELOW THIS LINE!)
+# ----------------------------- #
+[all:children]
+baseline
+package_upgrade_reboot

@@ -1,0 +1,7 @@
+---
+ansible_ssh_user: tyler
+bash_description: Missouri Plex
+plex_media_server_install: true
+wireguard_install: true
+docker_install: true
+nvidia_install: true

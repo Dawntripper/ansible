@@ -1,0 +1,5 @@
+---
+- name: "Host Shutdown:"
+  hosts: shutdown
+  roles:
+  - system/shutdown

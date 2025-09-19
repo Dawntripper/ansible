@@ -1,0 +1,6 @@
+---
+ansible_ssh_user: tyler
+bash_description: Dusker LXC
+plex_media_server_install: false
+wireguard_install: false
+docker_install: true

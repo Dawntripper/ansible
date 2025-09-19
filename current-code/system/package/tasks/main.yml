@@ -1,0 +1,168 @@
+---
+# Test Elevated Privledges:
+# --- #
+- name: Test Elevated Permissions
+  command: id -u
+  register: user_id
+  become: yes  # Use sudo/root for this task only
+  become_method: sudo
+  changed_when: false
+
+- name: Fail When Elevation Test Fails
+  fail:
+    msg: "Failed to become root! Check sudo permissions."
+  when: user_id.stdout != "0"
+# --- #
+
+# Upgrade Common Use Packages:
+# --- #
+- name: Upgrade Packages to Latest (Ubuntu)
+  become: true
+  ansible.builtin.apt:
+    name: "*"
+    update_cache: yes
+    state: latest
+  when: "(ansible_os_family == 'Debian')"
+# --- #
+
+# Install Common Use Packages:
+# --- #
+- name: "Install Common Packages"
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
+    state: present
+  when: "(ansible_os_family == 'Debian')"
+
+- name: "Set Nano as the default editor"
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/default_editor.sh
+    line: 'export EDITOR=nano'
+    create: yes
+    state: present
+# - #
+# Nano | END
+
+# --- #
+
+# Plex | START
+# --- #
+- name: "Configure Plex Repository"
+  ansible.builtin.apt_repository:
+    repo: "deb https://downloads.plex.tv/repo/deb/ public main"
+    state: "present"
+    update_cache: false
+  register: status_plex_repo
+  when: plex_media_server_install
+
+- name: "Add Plex repository key"
+  ansible.builtin.apt_key:
+    url: "https://downloads.plex.tv/plex-keys/PlexSign.key"
+    state: present
+  register: status_plex_repo
+  when: plex_media_server_install
+
+- name: "Install Plex Media Server"
+  ansible.builtin.apt:
+    name: "{{ plex_media_server_packages }}"
+    state: present
+    update_cache: "{{ status_plex_repo.changed }}"
+  when: plex_media_server_install
+
+- name: "Ensure Plex Media Server is enabled and running."
+  ansible.builtin.systemd:
+    name: plexmediaserver
+    enabled: yes
+    state: started
+  when: plex_media_server_install
+
+- name: Create '/media' directory
+  ansible.builtin.file:
+    path: '/media'
+    state: directory
+    mode: 0775
+    group: dusktripper
+    owner: tyler
+  when: plex_media_server_install
+# --- #
+# Plex | END
+
+# Wireguard | START
+# --- #
+- name: "Install Wireguard VPN Client"
+  ansible.builtin.apt:
+    name: "{{ wireguard_packages }}"
+    state: present
+  when: ansible_os_family == "Debian" and wireguard_install
+# --- #
+# Wireguard | END
+
+# Docker | START
+# --- #
+- name: "Add Docker GPG APT Key"
+  ansible.builtin.apt_key:
+    url: "https://download.docker.com/linux/ubuntu/gpg"
+    state: present
+  when: ansible_os_family == "Debian" and docker_install
+
+- name: "Add Docker Repository"
+  ansible.builtin.apt_repository:
+    repo: "deb https://download.docker.com/linux/ubuntu focal stable"
+    state: present
+  when: ansible_os_family == "Debian" and docker_install
+
+- name: Install Docker-CE
+  ansible.builtin.apt:
+    name: "{{ docker_packages }}"
+    state: latest
+    update_cache: true
+  when: ansible_os_family == "Debian" and docker_install
+
+- name: "Ensure the 'docker' group exists"
+  ansible.builtin.group:
+    name: docker
+    state: present
+  when: ansible_os_family == "Debian" and docker_install
+
+- name: "Add 'tyler' user to the 'docker' group"
+  ansible.builtin.user:
+    name: "tyler"
+    groups: docker
+    append: yes
+  when: ansible_os_family == "Debian" and docker_install
+
+- name: Create 'docker' directory
+  ansible.builtin.file:
+    path: '/docker'
+    state: directory
+    mode: 0775
+    group: dusktripper
+    owner: tyler
+  when: ansible_os_family == "Debian" and docker_install
+
+- name: Create cronjob to chown and chmod a directory recursively
+  cron:
+    name: "Chown and chmod /docker"
+    minute: "0"
+    hour: "*"
+    job: "sudo chown -R tyler:tyler /docker && sudo chmod -R 777 /docker"
+    user: tyler
+  when: ansible_os_family == "Debian" and docker_install
+
+# --- #
+# Docker | END
+
+# NVIDIA Driver | START
+# --- #
+- name: Install NVIDIA Drivers
+  ansible.builtin.apt:
+    name:
+      - nvidia-headless-550-server
+      - nvidia-utils-550-server
+      - libnvidia-encode-550-server
+      - nvtop
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian" and nvidia_install
+
+# --- #
+# NVIDIA Driver | END

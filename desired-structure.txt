@@ -1,0 +1,18 @@
+ansible/
+├── playbooks/
+│   ├── example1.yml
+│   └── example2.yml
+├── inventories/
+│   ├── homelab/
+│   │   ├── hosts.ini
+│   │   └── group_vars/
+│   │       └── all.yml
+├── roles/
+│   ├── example1/
+│   │   └── tasks/main.yml
+│   └── example2/
+│       └── tasks/main.yml
+├── collections/
+│   └── requirements.yml
+├── ansible.cfg
+└── README.md

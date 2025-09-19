@@ -2,4 +2,4 @@
 - name: "Maintenance | Package Upgrade"
   hosts: package_upgrade
   roles:
-  - system/package
+  - system-package

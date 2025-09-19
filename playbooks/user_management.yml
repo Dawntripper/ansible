@@ -2,4 +2,4 @@
 - name: "User Management | Sudo"
   hosts: user_management
   roles:
-  - user/add
+  - user-add
